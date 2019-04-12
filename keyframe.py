@@ -99,6 +99,9 @@ class TransformKeyFrames:
     def get_last_value_trans(self):
         return self.translation.get_last_value()
 
+    def get_trans(self):
+        return self.translation
+
 class KeyFrameControlNode(Node):
     """ Place node with transform keys above a controlled subtree """
     def __init__(self, translate_keys, rotate_keys, scale_keys, interpolate_translate = lerp, **kwargs):
@@ -133,3 +136,6 @@ class KeyFrameControlNode(Node):
 
     def get_last_value_trans(self):
         return self.keyframes.get_last_value_trans()
+
+    def get_trans(self):
+        return self.keyframes.get_trans()

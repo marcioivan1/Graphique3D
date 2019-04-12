@@ -30,4 +30,6 @@ class ProjectileGuide(Projectile):
             trajet = trajet / np.linalg.norm(trajet)
             position_init = (planete_depart.get_position()
                 + self.get_rayon()*trajet)
-
+            self.destination = planete_arrive.get_trans()
+            super().__init__(objet,position_init, rotate_keys,
+                             scale, vitesse)

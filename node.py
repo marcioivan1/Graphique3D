@@ -5,7 +5,7 @@ class Node:
     def __init__(self, name='', children=(), transform=identity(), **param):
         self.transform, self.param, self.name = transform, param, name
         self.children = list(iter(children))
-        self.position = self.transform[:4,:4]@vec(0,0,0,1)
+        self.position = self.transform[:3,:3]@vec(0,0,0)
 
     def add(self, *drawables):
         """ Add drawables to this node, simply updating children list """
@@ -16,7 +16,7 @@ class Node:
         # merge named parameters given at initialization with those given here
         param = dict(param, **self.param)
         model2 = model @ self.transform 
-        self.position = self.transform[:4,:4]@vec(0,0,0,1)
+        self.position = self.transform[:3,:3]@vec(0,0,0)
         for child in self.children:
             child.draw(projection, view, model2, **param)
 
