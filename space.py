@@ -131,7 +131,7 @@ class SystemeSolaire(Node):
 
         fusee = ProjectileGuide('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
                      transform_terre.get_Planete(),
-                        soleil, vec(1,0,0),20,1,vec(0,100,0))
+                        soleil, vec(1,0,0),0,vec(-1,0,0),90,1,vec(0,100,0))
         '''fusee = ProjectileGuide('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
                      transform_terre.get_Planete(),
                         soleil,vec(0,0,0),rotate_keys_t_sun, 1,

@@ -25,6 +25,7 @@ from itertools import cycle
 
 from space import SystemeSolaire
 from node import Node
+from projectile import *
 
 # ------------ low level OpenGL object wrappers ----------------------------
 
@@ -271,6 +272,9 @@ def main():
 
     system = SystemeSolaire()
     viewer.add(system)
+    '''fusee = Projectile('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
+                 vec(0,0,0),vec(0,0,0),0,
+                    vec(-1,0,0),90,0.001,vec(0,00,0))
 
     #viewer.add(transform_base)'''
     '''viewer.add(*[mesh for file in sys.argv[1:] for mesh in

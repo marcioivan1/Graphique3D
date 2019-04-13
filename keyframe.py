@@ -102,6 +102,9 @@ class TransformKeyFrames:
     def get_last_value_trans(self):
         return self.translation.get_last_value()
 
+    def get_last_value_rota(self):
+        return self.rotation.get_last_value()
+
     def get_trans(self):
         return self.translation
 
@@ -141,6 +144,9 @@ class KeyFrameControlNode(Node):
 
     def get_last_value_trans(self):
         return self.keyframes.get_last_value_trans()
+
+    def get_last_value_rota(self):
+        return self.keyframes.get_last_value_rota()
 
     def get_trans(self):
         return self.keyframes.get_trans()
