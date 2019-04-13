@@ -57,6 +57,8 @@ class PlaneteTransform(KeyFrameControlNode):
         planeteP = Planete(planete, vrot, periode1, scale)
         self.add(planeteP)
 
+    def get_Planete(self):
+        return self.children[0]
         
 #Create a Solar System : we can add node below
 class SystemeSolaire(Node):
@@ -121,14 +123,20 @@ class SystemeSolaire(Node):
         translate_keys_t_sun = {0: vec(0, 0, 00), 2: vec(0, 0, 00),
                                 4: vec(0, 0, 00)}
         rotate_keys_t_sun = {0: quaternion(), 2: quaternion()}
-        scale_keys_t_sun = {0: 1, 2: 1, 4: 1}
+        scale_keys_t_sun = {0: 0.0001, 2: 0.0001}
 
-        fusee = Projectile('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
-                     vec(0,0,0),rotate_keys_t_sun, 1,
-                     vec(0,100,00))
         transform_terre = PlaneteTransform('objet3D/Earth_v1_L3.123cce489830-ca89-49f4-bb2a-c921cce7adb2/13902_Earth_v1_l3.obj',
                                    np.array([1,1,0]), 1,
                                    np.array([9500,0,0]),1,np.array([1,1,0]),36.5)
+
+        fusee = ProjectileGuide('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
+                     transform_terre.get_Planete(),
+                        soleil, vec(1,0,0),20,1,vec(0,100,0))
+        '''fusee = ProjectileGuide('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
+                     transform_terre.get_Planete(),
+                        soleil,vec(0,0,0),rotate_keys_t_sun, 1,
+                     vec(0,0,0),rotate_keys_t_sun, 1,
+                     vec(0,100,00))'''
 
         transform_lune = PlaneteTransform('objet3D/Moon/Moon2K.obj',
                                    np.array([1,1,1]), 2,
@@ -139,7 +147,13 @@ class SystemeSolaire(Node):
         transform_base = KeyFrameControlNode(translate_keys_t_sun,
                                    rotate_keys_t_sun,
                                               scale_keys_t_sun)
+        scale_keys_t_sun2 = {0:1, 2:1}
+        transform_base2 = KeyFrameControlNode(translate_keys_t_sun,
+                                   rotate_keys_t_sun,
+                                              scale_keys_t_sun2)
         transform_base.add(soleil)
-        transform_base.add(fusee) 
         transform_base.add(transform_terre)
+        transform_base.add(fusee) 
+        transform_base2.add(transform_base)
+        transform_base2.add(fusee) 
         self.add(transform_base)

@@ -96,6 +96,12 @@ def scale(x, y=None, z=None):
     return np.diag((x, y, z, 1))
 
 
+def get_scale_matrix1D(matrix):
+    vec1 = matrix@vec(1,0,0,1)
+    vec2 = matrix@vec(2,0,0,1)
+    return np.linalg.norm(vec2-vec1)
+
+
 def sincos(degrees=0.0, radians=None):
     """ Rotation utility shortcut to compute sine and cosine of an angle. """
     radians = radians if radians else math.radians(degrees)
