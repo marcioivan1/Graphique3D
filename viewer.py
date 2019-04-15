@@ -26,6 +26,7 @@ from itertools import cycle
 from space import SystemeSolaire
 from node import Node
 from projectile import *
+from skybox import *
 
 # ------------ low level OpenGL object wrappers ----------------------------
 
@@ -89,6 +90,29 @@ void main() {
     colorFinal = Ka + color*scalarProduct +
         Ks*pow(scalar_product2,s);
     outColor = vec4(colorFinal,1);
+}"""
+
+# -------------- Skybox texture shaders ---------------------------------------
+TEXTURE_SKYBOX_VERT = """#version 330 core
+uniform mat4 viewprojection;
+layout(location = 0) in vec3 position;
+out vec3 fragTexCoord;
+
+void main() {
+    gl_Position = viewprojection * vec4(position, 1);
+    // fragTexCoord = position.xy;
+    fragTexCoord = position;
+}"""
+
+TEXTURE_SKYBOX_FRAG = """#version 330 core
+uniform samplerCube skybox; // each such OpenGL sampler is meant to be associated to an active texture unit
+in vec3 fragTexCoord;
+out vec4 outColor;
+void main() {
+    // access the texture and retrieve an RGBA color from it
+    // (automatically filtered/interpolated according to the parameters passed at initialization)
+    // a set of texture coordinates is passed in [0,1]^2 (vec2 type) to address which texel is retrieved
+    outColor = texture(skybox, fragTexCoord); 
 }"""
 
 
@@ -175,6 +199,7 @@ class Viewer:
 
         # compile and initialize shader programs once globally
         self.color_shader = Shader(COLOR_VERT, COLOR_FRAG)
+        self.texture_shader_skybox = Shader(TEXTURE_SKYBOX_VERT, TEXTURE_SKYBOX_FRAG)
 
         # initially empty list of object to draw
         self.drawables = []
@@ -198,7 +223,8 @@ class Viewer:
             # draw our scene objects
             for drawable in self.drawables:
                 drawable.draw(projection, view, identity(),
-                              color_shader=self.color_shader, win=self.win)
+                              color_shader=self.color_shader, win=self.win, 
+                              texture_shader_skybox=self.texture_shader_skybox)
 
             # flush render commands, and swap draw buffers
             glfw.swap_buffers(self.win)
@@ -217,6 +243,7 @@ class Viewer:
                 glfw.set_window_should_close(self.win, True)
             if key == glfw.KEY_W:
                 GL.glPolygonMode(GL.GL_FRONT_AND_BACK, next(self.fill_modes))
+            if key == glfw.KEY_SPACE: glfw.set_time(0)
 
 
 # -------------- main program and scene setup --------------------------------
@@ -269,6 +296,10 @@ def main():
     keynode = KeyFrameControlNode(translate_keys, rotate_keys, scale_keys)
     keynode.add(Cylinder())
     viewer.add(keynode)'''
+
+    file = ["ame_nebula/right.tga", "ame_nebula/left.tga", "ame_nebula/top.tga", 
+    "ame_nebula/bottom.tga", "ame_nebula/front.tga", "ame_nebula/back.tga"]
+    viewer.add(Skybox(file=file))
 
     system = SystemeSolaire()
     viewer.add(system)
