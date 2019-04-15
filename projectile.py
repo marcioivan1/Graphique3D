@@ -6,7 +6,11 @@ from mesh import load_textured
 import numpy as np
 
 class Projectile(KeyFrameControlNode):
-
+    
+    #Begin at position_init with a constant speed: vitesse
+    #vrot is the axis of the rotation during time, with periode
+    #period
+    #vrot_init and angle_init are for the initial rotation
     def __init__(self, objet, position_init, vrot, periode,
                  vrot_init, angle_init, scale, vitesse):
         translate = {0: position_init, 1: position_init}
@@ -27,6 +31,7 @@ class Projectile(KeyFrameControlNode):
         super().__init__(translate, rotate_keys, scale2)
         self.add(*load_textured(objet))
         
+    #Update position with the speed
     def draw(self, projection, view, model, **param):
         taille = self.get_Taille_trans()
         if(glfw.get_time()> taille):
@@ -36,7 +41,7 @@ class Projectile(KeyFrameControlNode):
 
 
 class ProjectileGuide(Projectile):
-
+    #begin at planete_depart and go to planete_arrive
     def __init__(self, objet, planete_depart, planete_arrive,
                  vrot, periode, vrot_init, angle_init,
                  scale, vitesse):
