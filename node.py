@@ -1,6 +1,5 @@
 from transform import Trackball, identity, translate, rotate
 from transform import scale, lerp, vec
-from light import *
 import glfw
 
 class Node:
