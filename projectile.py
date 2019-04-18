@@ -33,6 +33,7 @@ class Projectile(KeyFrameControlNode):
 
     #Update position with the speed
     def draw(self, projection, view, model, **param):
+        param['position'] = self.get_position()
         taille = self.get_Taille_trans()
         if(glfw.get_time()> taille):
             self.add_value_trans(taille + 1,

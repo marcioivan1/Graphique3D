@@ -245,67 +245,11 @@ class Viewer:
                 GL.glPolygonMode(GL.GL_FRONT_AND_BACK, next(self.fill_modes))
             if key == glfw.KEY_SPACE: glfw.set_time(0)
 
-def salut():
-    bonj = {'yo': []}
-    bonj['yo'].append(5)
-    salut2(**bonj)
-    print(bonj)
-
-def salut2(**genre):
-    genre['yos']=4
-    print(genre)
 
 # -------------- main program and scene setup --------------------------------
 def main():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer()
-
-    salut()
-    # place instances of our basic objects
-    #viewer.add(*[mesh for file in sys.argv[1:] for mesh in load(file)])
-    #if len(sys.argv) < 2:
-    #    print('Usage:\n\t%s [3dfile]*\n\n3dfile\t\t the filename of a model in'
-    #          ' format supported by pyassimp.' % (sys.argv[0],))
-    '''cylinder = Cylinder()
-    base_shape = Node(transform=scale(0.3))     # make a thin cylinder
-
-    base_shape.add(cylinder)
-
-    # make a thin cylinder
-    arm_shape = Node(transform=translate(0,0,0.8)@scale(0.2))
-    arm_shape.add(cylinder)                     # shape of arm
-
-    # make a thin cylinder
-    forearm_shape = Node(transform=translate(0,0,0.9)@scale(0.1))
-    forearm_shape.add(cylinder)                 # shape of forearm
-
-    theta = 45.0        # base horizontal rotation angle
-    phi1 = 45.0         # arm angle
-    phi2 = 20.0         # forearm angle
-
-    transform_forearm = Node(transform=translate(0,0,0) @ rotate((1,0,0), phi2))
-    transform_forearm.add(forearm_shape)
-
-    transform_arm = Node(transform=rotate((1,0,0), phi1))
-    transform_arm.add(arm_shape, transform_forearm)
-
-    transform_base = Node(transform=rotate((1,0,0), theta))
-    transform_base.add(base_shape, transform_arm)
-    viewer.add(transform_base)'''
-    '''a = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
-    b = np.array([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]])
-    vector_keyframes = KeyFrames({0: a, 3: b, 6: b})
-    #vector_keyframes = KeyFrames({0: vec(1, 0, 0), 3: vec(0, 1, 0), 6: vec(0, 0, 1)})
-    print(vector_keyframes.value(1.5))'''
-
-
-    '''translate_keys = {0: vec(0, 0, 0), 2: vec(1, 1, 0), 4: vec(0, 0, 0)}
-    rotate_keys = {0: quaternion(), 2: quaternion_from_euler(180, 45, 90),
-                   3: quaternion_from_euler(180, 0, 180), 4: quaternion()}
-    scale_keys = {0: 1, 2: 0.5, 4: 1}
-    keynode = KeyFrameControlNode(translate_keys, rotate_keys, scale_keys)
-    keynode.add(Cylinder())
-    viewer.add(keynode)'''
 
     file = ["ame_nebula/right.tga", "ame_nebula/left.tga", "ame_nebula/top.tga", 
     "ame_nebula/bottom.tga", "ame_nebula/front.tga", "ame_nebula/back.tga"]
@@ -313,19 +257,6 @@ def main():
 
     system = SystemeSolaire()
     viewer.add(system)
-    '''fusee = Projectile('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
-                 vec(0,0,0),vec(0,0,0),0,
-                    vec(-1,0,0),90,0.001,vec(0,00,0))
-
-    #viewer.add(transform_base)'''
-    '''viewer.add(*[mesh for file in sys.argv[1:] for mesh in
-                 load_textured(file)])
-    if len(sys.argv) < 2:
-        print('Usage:\n\t%s [3dfile]*\n\n3dfile\t\t the filename of a model in'
-              ' format supported by pyassimp.' % (sys.argv[0],))
-    # start rendering loop'''
-    # texture = TexturedPlane('grass.png')
-    #viewer.add(texture)
     viewer.run()
 
 

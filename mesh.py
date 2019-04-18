@@ -69,6 +69,7 @@ out vec4 outColor;
 in vec3 monde_normal;
 uniform vec3 light_direction;
 vec4 color_final;
+vec4 color_final2;
 vec3 color_cal;
 
 void main() {
@@ -83,7 +84,8 @@ void main() {
         outColor = color_final;
     }
     else{
-        outColor = vec4(color_cal*scalarProduct,color_final[3]);
+        color_final2 = vec4(color_cal*scalarProduct,color_final[3]);
+        outColor = 0.05*color_final + 0.95*color_final2;
     }
     
 }"""
