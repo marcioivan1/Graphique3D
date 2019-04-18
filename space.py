@@ -1,5 +1,5 @@
 import math
-from node import Node
+from node import *
 from keyframe import *
 from mesh import load_textured
 from transform import Trackball, identity, translate, rotate, scale, lerp, vec
@@ -8,7 +8,6 @@ from transform import (quaternion_slerp, quaternion_matrix, quaternion,
                        quaternion_from_axis_angle)
 import numpy as np
 from projectile import *
-
 
 class Planete(KeyFrameControlNode):
 
@@ -71,12 +70,11 @@ class PlaneteTransform(KeyFrameControlNode):
                 del param['position']
         if(not self.lumineux):
             param['position'] = self.get_position()
-            print(self.get_position())
         super().draw(projection, view, model, **param)
 
     def get_Planete(self):
         return self.children[0]
-        
+
 #Create a Solar System : we can add node below
 class SystemeSolaire(Node):
 
@@ -111,7 +109,7 @@ class SystemeSolaire(Node):
 
         terre_shape = KeyFrameControlNode(translate_keys_earth,
                                    rotate_keys_earth, scale_keys_earth)
-        #terre_shape.add(terre)                     
+        #terre_shape.add(terre)
 
 
         rotate_keys_t_earth = {0: quaternion(), 2: quaternion(),
@@ -148,8 +146,14 @@ class SystemeSolaire(Node):
                                    np.array([9500,0,0]),1,np.array([1,1,0]),36.5)
 
         fusee = ProjectileGuide('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
-                     transform_terre.get_Planete(),
+                        transform_terre.get_Planete(),
                         transform_base.get_Planete(), vec(1,0,0),0,vec(-1,0,0),90,1,vec(0,100,0))
+
+        rot_fusee_vert = RotationControlNode(glfw.KEY_UP, glfw.KEY_DOWN, vec(1, 0, 0))
+        rot_fusee_horiz = RotationControlNode(glfw.KEY_LEFT, glfw.KEY_RIGHT, vec(0, 1, 0))
+        rot_fusee_vert.add(fusee)
+        rot_fusee_horiz.add(rot_fusee_vert)
+
         '''fusee = ProjectileGuide('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
                      transform_terre.get_Planete(),
                         soleil,vec(0,0,0),rotate_keys_t_sun, 1,
@@ -167,7 +171,7 @@ class SystemeSolaire(Node):
                                    rotate_keys_t_sun,
                                               scale_keys_t_sun2)
         transform_base.add(transform_terre)
-        transform_base.add(fusee) 
+        transform_base.add(rot_fusee_horiz)
         transform_base2.add(transform_base)
-        transform_base2.add(fusee) 
+        transform_base2.add(rot_fusee_horiz)
         self.add(transform_base)

@@ -6,7 +6,7 @@ from mesh import load_textured
 import numpy as np
 
 class Projectile(KeyFrameControlNode):
-    
+
     #Begin at position_init with a constant speed: vitesse
     #vrot is the axis of the rotation during time, with periode
     #period
@@ -30,7 +30,7 @@ class Projectile(KeyFrameControlNode):
             rotate_keys = {0: self.rot_init, 1: self.rot_init}
         super().__init__(translate, rotate_keys, scale2)
         self.add(*load_textured(objet))
-        
+
     #Update position with the speed
     def draw(self, projection, view, model, **param):
         taille = self.get_Taille_trans()
@@ -46,7 +46,7 @@ class ProjectileGuide(Projectile):
                  vrot, periode, vrot_init, angle_init,
                  scale, vitesse):
         if(not planete_depart.is_Planete() or
-           not planete_depart.is_Planete()):
+           not planete_arrive.is_Planete()):
             print("planete_depart or planete_arrive is not a Planete in ProjectileGuide")
         self.depart = planete_depart
         self.destination = planete_arrive
@@ -69,7 +69,7 @@ class ProjectileGuide(Projectile):
 
     def update_speed(self):
         speed = self.vitesse
-        self.vitesse = self.destination.get_position() - self.get_position() 
+        self.vitesse = self.destination.get_position() - self.get_position()
         norm_v = np.linalg.norm(self.vitesse)
         if(norm_v == 0):
             self.vitesse = speed
@@ -80,7 +80,7 @@ class ProjectileGuide(Projectile):
         direct = self.destination.get_position() - self.get_position()
         if(np.linalg.norm(direct)==0):
             return self.rot_init
-        v_rota = np.cross(vec(0,1,0), direct) 
+        v_rota = np.cross(vec(0,1,0), direct)
         cos_angle = np.dot(vec(0,1,0),
                            direct)/np.linalg.norm(direct)
         angle = np.arccos(cos_angle)
@@ -88,4 +88,3 @@ class ProjectileGuide(Projectile):
         return quaternion_mul(quaternion_from_axis_angle(v_rota,
                                                          angle),
                               self.rot_init)
-

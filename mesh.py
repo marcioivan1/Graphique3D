@@ -157,8 +157,6 @@ class TexturedMesh:
         light_direction = (0,0,0)
 
         if('light' in _kwargs and 'position' in _kwargs):
-            print(_kwargs['position'])
-            print('yo')
             light_direction = normalized(_kwargs['light']-_kwargs['position'])
         
 
