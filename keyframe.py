@@ -110,8 +110,9 @@ class TransformKeyFrames:
 
 class KeyFrameControlNode(Node):
     """ Place node with transform keys above a controlled subtree """
-    def __init__(self, translate_keys, rotate_keys, scale_keys, interpolate_translate = lerp, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, translate_keys, rotate_keys, scale_keys,
+                 name='', interpolate_translate = lerp, **kwargs):
+        super().__init__(name, **kwargs)
         self.keyframes = TransformKeyFrames(translate_keys,
                                             rotate_keys,
                                             scale_keys,

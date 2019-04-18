@@ -1,5 +1,6 @@
 from transform import Trackball, identity, translate, rotate
 from transform import scale, lerp, vec
+from light import *
 
 class Node:
     """ Scene graph transform and parameter broadcast node """
@@ -8,9 +9,11 @@ class Node:
         self.children = list(iter(children))
         pos = self.transform[:4,:4]@vec(0,0,0,1)
         self.position = pos[:3]
+        #self.lightList = Light_list()
 
     def add(self, *drawables):
         """ Add drawables to this node, simply updating children list """
+        #self.lightList.add()
         self.children.extend(drawables)
 
     def draw(self, projection, view, model, **param):

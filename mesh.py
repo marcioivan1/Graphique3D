@@ -5,6 +5,7 @@ from shader import *
 from vertex import *
 from itertools import cycle
 import glfw                 # lean window system wrapper for OpenGL
+from transform import normalized
 
 class ColorMesh:
 
@@ -47,9 +48,16 @@ TEXTURE_VERT = """#version 330 core
 uniform mat4 modelviewprojection;
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 tex_uv;
+layout(location = 2) in vec3 normal;
+
+
+uniform mat3 transinvmod;
+out vec3 monde_normal;
+
 out vec2 fragTexCoord;
 void main() {
     gl_Position = modelviewprojection * vec4(position, 1);
+    monde_normal = transinvmod*normal;
     fragTexCoord = tex_uv;
 }"""
 
@@ -57,8 +65,27 @@ TEXTURE_FRAG = """#version 330 core
 uniform sampler2D diffuseMap;
 in vec2 fragTexCoord;
 out vec4 outColor;
+
+in vec3 monde_normal;
+uniform vec3 light_direction;
+vec4 color_final;
+vec3 color_cal;
+
 void main() {
-    outColor = texture(diffuseMap, fragTexCoord);
+    float scalarProduct=dot(normalize(monde_normal),
+    normalize(light_direction));
+    if(scalarProduct < 0){
+        scalarProduct = 0.;
+    }
+    color_final = texture(diffuseMap, fragTexCoord);
+    color_cal = vec3(color_final);
+    if(light_direction == vec3(0,0,0)){
+        outColor = color_final;
+    }
+    else{
+        outColor = vec4(color_cal*scalarProduct,color_final[3]);
+    }
+    
 }"""
 class PhongMesh:
 
@@ -114,6 +141,7 @@ class TexturedMesh:
         self.texture = Texture(self.file, self.wrap_mode, *self.filter_mode)
 
     def draw(self, projection, view, model, win=None, **_kwargs):
+        
 
         # some interactive elements
         if glfw.get_key(win, glfw.KEY_E) == glfw.PRESS:
@@ -123,13 +151,28 @@ class TexturedMesh:
         if glfw.get_key(win, glfw.KEY_R) == glfw.PRESS:
             self.filter_mode = next(self.filter)
             self.texture = Texture(self.file, self.wrap_mode, *self.filter_mode)
-
+        
         GL.glUseProgram(self.shader.glid)
+        
+        light_direction = (0,0,0)
+
+        if('light' in _kwargs and 'position' in _kwargs):
+            print(_kwargs['position'])
+            print('yo')
+            light_direction = normalized(_kwargs['light']-_kwargs['position'])
+        
 
         # projection geometry
         loc = GL.glGetUniformLocation(self.shader.glid, 'modelviewprojection')
         GL.glUniformMatrix4fv(loc, 1, True, projection @ view @ model)
 
+        loc2 = GL.glGetUniformLocation(self.shader.glid,
+                                       'light_direction')
+        GL.glUniform3fv(loc2, 1, light_direction)
+        loc3 = GL.glGetUniformLocation(self.shader.glid,
+                                       'transinvmod')
+        GL.glUniformMatrix3fv(loc3, 1, True, 
+                              np.transpose(np.linalg.inv(model[:3,:3])))
         # texture access setups
         loc = GL.glGetUniformLocation(self.shader.glid, 'diffuseMap')
         GL.glActiveTexture(GL.GL_TEXTURE0)
@@ -212,6 +255,8 @@ def load(file):
     pyassimp.release(scene)
     return meshes
 
+
+
 def load_textured(file):
     """ load resources using pyassimp, return list of TexturedMeshes """
     try:
@@ -245,8 +290,11 @@ def load_textured(file):
         tex_uv = ((0, 1) + mesh.texturecoords[0][:, :2] * (1, -1)
                   if mesh.texturecoords.size else None)
 
+        normal = mesh.normals
         # create the textured mesh object from texture, attributes, and indices
-        meshes.append(TexturedMesh(texture, [mesh.vertices, tex_uv], mesh.faces))
+        meshes.append(TexturedMesh(texture, [mesh.vertices,
+                                             tex_uv, normal],
+                                   mesh.faces))
 
     size = sum((mesh.faces.shape[0] for mesh in scene.meshes))
     print('Loaded %s\t(%d meshes, %d faces)' % (file, len(scene.meshes), size))

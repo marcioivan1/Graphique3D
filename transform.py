@@ -31,6 +31,10 @@ def lerp(point_a, point_b, fraction):
 
 def lerpCircle(point_a, point_b, fraction):
 
+    if(np.linalg.norm(point_a)==0):
+        return point_a
+    if(np.linalg.norm(point_b)==0):
+        return point_b
     costheta = np.dot(point_a, point_b)/(np.linalg.norm(point_a) * np.linalg.norm(point_b))
     theta = np.arccos(costheta) 
     theta = theta*180/np.pi

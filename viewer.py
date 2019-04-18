@@ -219,7 +219,7 @@ class Viewer:
             winsize = glfw.get_window_size(self.win)
             view = self.trackball.view_matrix()
             projection = self.trackball.projection_matrix(winsize)
-            
+
             # draw our scene objects
             for drawable in self.drawables:
                 drawable.draw(projection, view, identity(),
@@ -245,12 +245,22 @@ class Viewer:
                 GL.glPolygonMode(GL.GL_FRONT_AND_BACK, next(self.fill_modes))
             if key == glfw.KEY_SPACE: glfw.set_time(0)
 
+def salut():
+    bonj = {'yo': []}
+    bonj['yo'].append(5)
+    salut2(**bonj)
+    print(bonj)
+
+def salut2(**genre):
+    genre['yos']=4
+    print(genre)
 
 # -------------- main program and scene setup --------------------------------
 def main():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer()
 
+    salut()
     # place instances of our basic objects
     #viewer.add(*[mesh for file in sys.argv[1:] for mesh in load(file)])
     #if len(sys.argv) < 2:
