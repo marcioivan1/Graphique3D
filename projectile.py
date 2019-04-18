@@ -3,6 +3,7 @@ from transform import quaternion_from_axis_angle
 from transform import get_scale_matrix1D
 from transform import quaternion_mul
 from mesh import load_textured
+import glfw
 import numpy as np
 
 class Projectile(KeyFrameControlNode):
@@ -32,13 +33,13 @@ class Projectile(KeyFrameControlNode):
         self.add(*load_textured(objet))
 
     #Update position with the speed
-    def draw(self, projection, view, model, **param):
-        param['position'] = self.get_position()
+    def draw(self, projection, view, model, win, **param):
+        #param['position'] = self.get_position()
         taille = self.get_Taille_trans()
         if(glfw.get_time()> taille):
             self.add_value_trans(taille + 1,
                 self.get_last_value_trans() + self.vitesse)
-        super().draw(projection, view, model, **param)
+        super().draw(projection, view, model, win, **param)
 
 
 class ProjectileGuide(Projectile):
@@ -51,13 +52,26 @@ class ProjectileGuide(Projectile):
             print("planete_depart or planete_arrive is not a Planete in ProjectileGuide")
         self.depart = planete_depart
         self.destination = planete_arrive
+        self.prepa = False
+        self.vitesse_avant_depart = vec(0,0,0)
         super().__init__(objet,vec(0,0,0), vrot, periode,
                          vrot_init,angle_init,scale, vitesse)
 
-    def draw(self, projection, view, model, **param):
-        if(np.linalg.norm(self.position)==0):
+    def draw(self, projection, view, model, win, **param):
+        '''if(np.linalg.norm(self.position)==0):
 
             time =glfw.get_time() +1
+            self.add_value_trans(time,
+                                 self.depart.get_position()/
+                                 get_scale_matrix1D(model))'''
+        if glfw.get_key(win, glfw.KEY_D) == glfw.PRESS:
+            self.prepa=True
+
+        if(self.is_arrive()):
+            self.prepa=False
+
+        if(self.prepa==False):
+            time = glfw.get_time()+0.4
             self.add_value_trans(time,
                                  self.depart.get_position()/
                                  get_scale_matrix1D(model))
@@ -66,7 +80,7 @@ class ProjectileGuide(Projectile):
         if(glfw.get_time()> taille):
             self.add_value_rota(taille + 1,
                 self.compute_quaternion())
-        super().draw(projection, view, model, **param)
+        super().draw(projection, view, model, win, **param)
 
     def update_speed(self):
         speed = self.vitesse
@@ -76,6 +90,12 @@ class ProjectileGuide(Projectile):
             self.vitesse = speed
         self.vitesse = self.vitesse / np.linalg.norm(self.vitesse)
         self.vitesse = self.vitesse * np.linalg.norm(speed)
+
+    def is_arrive(self):
+                
+        return (np.linalg.norm(self.destination.get_position()
+                              - self.position)-0.15
+                < self.destination.get_rayon())
 
     def compute_quaternion(self):
         direct = self.destination.get_position() - self.get_position()

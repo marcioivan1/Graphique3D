@@ -119,10 +119,10 @@ class KeyFrameControlNode(Node):
                                             interpolate_translate)
         self.position = vec(0,0,0)
 
-    def draw(self, projection, view, model, **param):
+    def draw(self, projection, view, model, win, **param):
         """ When redraw requested, interpolate our node transform from keys """
         self.transform = self.keyframes.valueCycle(glfw.get_time())
-        super().draw(projection, view, model, **param)
+        super().draw(projection, view, model, win, **param)
 
 
     def get_Taille_rota(self):

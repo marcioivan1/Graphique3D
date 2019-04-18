@@ -223,7 +223,8 @@ class Viewer:
             # draw our scene objects
             for drawable in self.drawables:
                 drawable.draw(projection, view, identity(),
-                              color_shader=self.color_shader, win=self.win, 
+                              color_shader=self.color_shader,
+                              win=self.win,
                               texture_shader_skybox=self.texture_shader_skybox)
 
             # flush render commands, and swap draw buffers

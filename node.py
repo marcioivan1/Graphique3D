@@ -16,7 +16,7 @@ class Node:
         #self.lightList.add()
         self.children.extend(drawables)
 
-    def draw(self, projection, view, model, **param):
+    def draw(self, projection, view, model, win, **param):
         """ Recursive draw, passing down named parameters & model matrix. """
         # merge named parameters given at initialization with those given here
         param = dict(param, **self.param)
@@ -24,7 +24,7 @@ class Node:
         pos = model2@vec(0,0,0,1)
         self.position = pos[:3]
         for child in self.children:
-            child.draw(projection, view, model2, **param)
+            child.draw(projection, view, model2, win, **param)
 
     def is_Planete(self):
         return False

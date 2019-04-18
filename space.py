@@ -13,7 +13,7 @@ class Planete(KeyFrameControlNode):
 
     #load planete object, the planete turn around vrot axis with
     #periode period
-    def __init__(self, planete, vrot, periode, scale, name='', **kwargs):
+    def __init__(self, planete, vrot, periode, scale, rayon, name='', **kwargs):
         translate = {0: vec(0,0,0), 1: vec(0,0,0)}
         rotate = {0: quaternion(), periode/4:
                   quaternion_from_axis_angle(
@@ -23,9 +23,15 @@ class Planete(KeyFrameControlNode):
                   quaternion_from_axis_angle(
             vrot, degrees = 270), periode: quaternion()}
         scale = {0: scale, 2: scale}
-        self.rayon = 1.;
+        self.rayonModel = rayon
+        self.rayon = rayon
         super().__init__(translate, rotate, scale, name, **kwargs)
         self.add(*load_textured(planete))
+
+
+    def draw(self, projection, view, model, win, **param):
+       self.rayon = self.rayonModel*get_scale_matrix1D(model) 
+       super().draw(projection, view, model, win, **param)
 
 
     def is_Planete(self):
@@ -40,7 +46,7 @@ class PlaneteTransform(KeyFrameControlNode):
     around the center of the node, with a periode2 period and the
     initial position is vecDeb'''
     def __init__(self, planete, vrot, periode1, vecDeb, scale,
-                 vdirec, periode2, name='', lumineux=False, **kwargs):
+                 vdirec, periode2, rayon, name='', lumineux=False, **kwargs):
         if (name=='' and lumineux == True):
             print("Un objet lumineux doit avoir un nom")
         vrot2 = np.cross(vecDeb, vdirec)
@@ -60,17 +66,17 @@ class PlaneteTransform(KeyFrameControlNode):
             kwargs['light'] = (0,0,0)
         super().__init__(translate, rotate2, scale2, name,
                          lerpCircle, **kwargs)
-        planeteP = Planete(planete, vrot, periode1, scale)
+        planeteP = Planete(planete, vrot, periode1, scale, rayon)
         self.add(planeteP)
 
-    def draw(self, projection, view, model, **param):
+    def draw(self, projection, view, model, win, **param):
         if(self.lumineux):
             param['light'] = self.get_position()
             if('position' in param):
                 del param['position']
         if(not self.lumineux):
             param['position'] = self.get_position()
-        super().draw(projection, view, model, **param)
+        super().draw(projection, view, model, win, **param)
 
     def get_Planete(self):
         return self.children[0]
@@ -91,6 +97,7 @@ class SystemeSolaire(KeyFrameControlNode):
         transform_base = PlaneteTransform('objet3D/Sun_v2_L3.123cbc92ee65-5f03-4298-b1e6-b236b6b8b4aa/13913_Sun_v2_l3.obj',
                   np.array([1, 1, 0]), 10,np.array([0, 0, 0]),
                                   2, np.array([0, 0.1, 0]), 10,
+                                          500,
                                   'soleil',True)
 
         translate_keys_t_sun = {0: vec(0, 0, 00), 2: vec(0, 0, 00),
@@ -99,17 +106,17 @@ class SystemeSolaire(KeyFrameControlNode):
 
         transform_terre = PlaneteTransform('objet3D/Earth_v1_L3.123cce489830-ca89-49f4-bb2a-c921cce7adb2/13902_Earth_v1_l3.obj',
                                    np.array([1,1,0]), 1,
-                                   np.array([9500,0,0]),1,np.array([1,1,0]),36.5)
+                                   np.array([9500,0,0]),1,np.array([1,1,0]),36.5,300)
 
 
 
 
         transform_lune = PlaneteTransform('objet3D/Moon/Moon2K.obj',
                                    np.array([1,1,1]), 2,
-                                   np.array([3500,0,0]),100,np.array([1,1,1]),5)
+                                   np.array([3500,0,0]),100,np.array([1,1,1]),5,100)
         transform_lune2 = PlaneteTransform('objet3D/Moon/Moon2K.obj',
                                    np.array([1,1,1]), 2,
-                                   np.array([0,15000,0]),200,np.array([1,1,1]),60)
+                                   np.array([0,15000,0]),200,np.array([1,1,1]),60,500)
         transform_terre.add(transform_lune)
 
         fusee = ProjectileGuide('objet3D/rocket_v1_L2.123c433550fa-0038-410c-a891-3367406a58a6/12216_rocket_v1_l2.obj',
@@ -131,6 +138,7 @@ class SystemeSolaire(KeyFrameControlNode):
         transform_base.add(transform_terre)
         transform_base.add(transform_lune2)
         transform_base.add(rot_fusee_horiz)
-        transform_base2.add(transform_base)
-        transform_base2.add(rot_fusee_horiz)
         self.add(transform_base)
+
+    def draw(self, projection, view, model, win, **param):
+        super().draw(projection, view, model, win, **param)
