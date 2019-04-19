@@ -27,6 +27,7 @@ from space import SystemeSolaire
 from node import Node
 from projectile import *
 from skybox import *
+from particles import *
 
 # ------------ low level OpenGL object wrappers ----------------------------
 
@@ -115,6 +116,37 @@ void main() {
     outColor = texture(skybox, fragTexCoord); 
 }"""
 
+# -------------- Particle texture shaders -------------------------------------
+TEXTURE_PARTICLE_VERT = """#version 330 core
+
+uniform mat4 projection;
+uniform vec2 offset;
+uniform vec4 color;
+
+layout(location = 0) in vec2 position;
+layout(location = 1) in vec2 texCoords;
+
+out vec2 fragTexCoord;
+out vec4 particleColor;
+
+void main() {
+    float scale = 10.0f;
+    gl_Position = projection * vec4((position * scale) + offset, 0.0, 1.0);
+    particleColor = color;
+    fragTexCoord = texCoords;
+}"""
+
+TEXTURE_PARTICLE_FRAG = """#version 330 core
+uniform sampler2D sprite;
+
+in vec2 fragTexCoord;
+in vec4 particleColor;
+out vec4 outColor;
+
+void main() {
+    outColor = (texture(sprite, fragTexCoord) * particleColor);
+}"""
+
 
 
 
@@ -200,6 +232,7 @@ class Viewer:
         # compile and initialize shader programs once globally
         self.color_shader = Shader(COLOR_VERT, COLOR_FRAG)
         self.texture_shader_skybox = Shader(TEXTURE_SKYBOX_VERT, TEXTURE_SKYBOX_FRAG)
+        self.texture_shader_particle = Shader(TEXTURE_PARTICLE_VERT, TEXTURE_PARTICLE_FRAG)
 
         # initially empty list of object to draw
         self.drawables = []
@@ -210,11 +243,18 @@ class Viewer:
         # cyclic iterator to easily toggle polygon rendering modes
         self.fill_modes = cycle([GL.GL_LINE, GL.GL_POINT, GL.GL_FILL])
         
-    def run(self):
+    def run(self, lastFrame=0):
         """ Main render loop for this OpenGL window """
         while not glfw.window_should_close(self.win):
             # clear draw buffer and depth buffer (<-TP2)
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+
+            currentFrame = glfw.get_time()
+            deltaTime = currentFrame - lastFrame
+            lastFrame = currentFrame
+            for d in self.drawables:
+                if isinstance(d, ParticleGenerator):
+                    d.update(dt=deltaTime)
 
             winsize = glfw.get_window_size(self.win)
             view = self.trackball.view_matrix()
@@ -225,7 +265,8 @@ class Viewer:
                 drawable.draw(projection, view, identity(),
                               color_shader=self.color_shader,
                               win=self.win,
-                              texture_shader_skybox=self.texture_shader_skybox)
+                              texture_shader_skybox=self.texture_shader_skybox, 
+                              texture_shader_particle=self.texture_shader_particle)
 
             # flush render commands, and swap draw buffers
             glfw.swap_buffers(self.win)
@@ -255,6 +296,9 @@ def main():
     file = ["ame_nebula/right.tga", "ame_nebula/left.tga", "ame_nebula/top.tga", 
     "ame_nebula/bottom.tga", "ame_nebula/front.tga", "ame_nebula/back.tga"]
     viewer.add(Skybox(file=file))
+
+    particles = ParticleGenerator(file="particle/p.png")
+    viewer.add(particles)
 
     system = SystemeSolaire()
     viewer.add(system)
