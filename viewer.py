@@ -27,7 +27,7 @@ from space import SystemeSolaire
 from node import Node
 from projectile import *
 from skybox import *
-from particles import *
+from particlesbis import *
 
 # ------------ low level OpenGL object wrappers ----------------------------
 
@@ -301,7 +301,7 @@ def main():
     viewer.add(particles)
 
     system = SystemeSolaire()
-    viewer.add(system)
+    #viewer.add(system)
     viewer.run()
 
 

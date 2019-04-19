@@ -9,6 +9,7 @@ import pyassimp.errors              # assimp error management + exceptions
 from PIL import Image               # load images for textures
 
 from vertex import *
+from transform import *
 
 
 # -----------------------------------------------------------------------------
@@ -17,7 +18,7 @@ class Particle:
 
     def __init__(self, position=np.array((0,0,0), 'f'),
                  velocity=np.array((0,1,0), 'f'),
-                 color=np.array((1,1,1,1), 'f'), life=20.1):
+                 color=np.array((1,1,1,1), 'f'), life=1.0):
 
         self.position = position
         self.velocity = velocity
@@ -47,7 +48,6 @@ class ParticleGenerator:
 
     def draw(self, projection, view, model, **param):
         for p in self.particles:
-            print(p.life)
             if (p.life > 0.0):
        
                 self.shader = param['texture_shader_particle']
@@ -85,19 +85,21 @@ class ParticleGenerator:
                 GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
 
-    def update(self, dt=0.0, obj=0, newParticles=2, offset=np.array((0,0,0), 'f')):
+    def update(self, dt, obj=0, newParticles=2, offset=np.array((0,0,0), 'f')):
 
-        for i in range(0, newParticles):
+        '''for i in range(0, newParticles):
             unusedParticle = self.firstUnusedParticle()
-            self.respawnParticle(self.particles[unusedParticle], obj, offset)
+            self.respawnParticle(self.particles[unusedParticle],
+            obj, offset)'''
 
-        for i in range(0, self.amount):
-            p = self.particles[i]
+        for p in self.particles:
+
             p.life -= dt
-
             if p.life > 0.0:
                 p.position -= p.velocity * dt
-                p.color[-1] -= dt * 2.5
+                #p.color = p.color * dt * 2.5
+            else:
+                self.respawnParticle(p)
 
 
     def firstUnusedParticle(self):
@@ -117,11 +119,12 @@ class ParticleGenerator:
 
     def respawnParticle(self, particle, obj=0, offset=np.array((0,0,0), 'f')):
         
-        rdm = ((random.randint(0, 32767) % 100) - 50) / 10.0
-        rColor = 0.5 + ((random.randint(0, 32767) % 100) / 100.0)
+        rdm = ((random.randint(0, 32767) % 100) - 50) / 50.0
+        rColor = 0.5 + ((random.randint(0, 32767) % 100) / 200.0)
         p = np.array((0,0,0), 'f')
-        particle.position = p + rdm + offset # obj.position
+        particle.position = p + vec(rdm, rdm, rdm) + offset # obj.position
         particle.color = np.array((rColor, rColor, rColor, 1.0), 'f')
         particle.life = 1.0
         v = np.array((0,1,0), 'f')
         particle.velocity = v * 0.1 # obj.velocity
+
