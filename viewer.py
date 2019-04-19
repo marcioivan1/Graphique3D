@@ -301,7 +301,7 @@ def main():
     viewer.add(particles)
 
     system = SystemeSolaire()
-    #viewer.add(system)
+    viewer.add(system)
     viewer.run()
 
 
